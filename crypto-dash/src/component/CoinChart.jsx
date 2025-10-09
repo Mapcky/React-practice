@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
-import Spinner from "./spinner";
+import Spinner from "./Spinner";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -31,8 +31,6 @@ const CoinChart = ({ coinId }) => {
 
   useEffect(() => {
     const fetchPrices = async () => {
-      const estaCosa = `${API_URL}/${coinId}/market_chart?vs_currency=usd&days=7`;
-      console.log(estaCosa);
       const res = await fetch(
         `${API_URL}/${coinId}/market_chart?vs_currency=usd&days=7`
       );
