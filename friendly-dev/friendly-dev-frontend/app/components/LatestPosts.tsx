@@ -7,11 +7,7 @@ type LatestPostsProps = {
 };
 
 const LatestPosts = ({ posts, limit = 3 }: LatestPostsProps) => {
-  const sorted = [...posts].sort((a: PostMeta, b: PostMeta) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-  });
-
-  const latest = sorted.slice(0, limit);
+  const latest = posts.slice(0, limit);
 
   return (
     <section className="max-w6xl mx-auto px-6 py-12">
