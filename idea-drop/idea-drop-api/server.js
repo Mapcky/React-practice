@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import ideaRoutes from "./routes/ideaRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import connectDB from "./config/db.js";
 
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 
 //Routes
 app.use("/api/ideas", ideaRoutes);
+app.use("/api/auth", authRoutes);
 
 //Fallback
 app.use((req, res, next) => {
