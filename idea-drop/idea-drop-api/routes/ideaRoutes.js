@@ -2,6 +2,7 @@ import express from "express";
 const router = express.Router();
 import Idea from "../models/idea.js";
 import mongoose from "mongoose";
+import { protect } from "../middleware/authMiddleware.js";
 
 //@route                      GET /api/ideas
 //@description                Get all ideas
@@ -53,8 +54,8 @@ router.get("/:id", async (req, res, next) => {
 //@route                  POST /api/ideas
 //@description            Create a new idea
 //@access                 Public
-router.post("/", async (req, res, next) => {
-  const { title, summary, description, tags } = req.body;
+router.post("/", protect, async (req, res, next) => {
+  const { title, summary, description, tags } = req.body || {};
 
   try {
     if (!title?.trim() || !summary?.trim() || !description?.trim()) {
@@ -74,6 +75,7 @@ router.post("/", async (req, res, next) => {
           : Array.isArray(tags)
           ? tags
           : [],
+      user: req.user.id,
     });
 
     const savedIdea = await newIdea.save();
@@ -88,7 +90,7 @@ router.post("/", async (req, res, next) => {
 //@route                      DELETE /api/ideas/:id
 //@description                delete a single idea
 //@access                     Public
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", protect, async (req, res, next) => {
   const { id: ideaId } = req.params;
 
   try {
@@ -98,12 +100,20 @@ router.delete("/:id", async (req, res, next) => {
       throw new Error("Idea Not Found");
     }
 
-    const idea = await Idea.findByIdAndUpdate;
+    const idea = await Idea.findById(id);
 
     if (!idea) {
       res.status(404);
-      throw new Error("Idea Not Found");
+      throw new Error("Idea not found");
     }
+
+    //Check if user owns idea
+    if (idea.user.toString() !== req.user._id.toString()) {
+      res.status(403);
+      throw new Error("Not authorized to delete this idea");
+    }
+
+    await idea.deleteOne();
 
     res.json({ message: "Idea deleted succesfully" });
   } catch (err) {
@@ -115,7 +125,7 @@ router.delete("/:id", async (req, res, next) => {
 //@route                      PUT /api/ideas/:id
 //@description                update an idea
 //@access                     Public
-router.put("/:id", async (req, res, next) => {
+router.put("/:id", protect, async (req, res, next) => {
   const { id: ideaId } = req.params;
 
   try {
@@ -125,30 +135,39 @@ router.put("/:id", async (req, res, next) => {
       throw new Error("Idea Not Found");
     }
 
-    const { title, summary, description, tags } = req.body;
+    const idea = await Idea.findById(id);
+
+    if (!idea) {
+      res.status(404);
+      throw new Error("Idea not found");
+    }
+
+    //Check if user owns idea
+    if (idea.user.toString() !== req.user._id.toString()) {
+      res.status(403);
+      throw new Error("Not authorized to update this idea");
+    }
+
+    const { title, summary, description, tags } = req.body || {};
 
     if (!title?.trim() || !summary?.trim() || !description?.trim()) {
       res.status(400);
       throw new Error("Title, summary and description are required");
     }
 
-    const updatedIdea = await Idea.findByIdAndUpdate(
-      ideaId,
-      {
-        title,
-        description,
-        summary,
-        tags: Array.isArray(tags)
-          ? tags
-          : tags.split(",").map((tag) => tag.trim()),
-      },
-      { new: true, runValidators: true }
-    );
+    idea.title = title;
+    idea.summary = summary;
+    idea.description = description;
+    idea.tags = Array.isArray(tags)
+      ? tags
+      : typeof tags === "string"
+      ? tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean)
+      : [];
 
-    if (!updatedIdea) {
-      res.status(404);
-      throw new Error("Idea not found");
-    }
+    const updatedIdea = await idea.save;
 
     res.json({ message: "Idea updated succesfully", idea: updatedIdea });
   } catch (err) {
