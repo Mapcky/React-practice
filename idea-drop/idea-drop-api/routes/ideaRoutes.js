@@ -77,7 +77,6 @@ router.post("/", protect, async (req, res, next) => {
           : [],
       user: req.user.id,
     });
-
     const savedIdea = await newIdea.save();
 
     res.status(201).json({ savedIdea });
@@ -94,7 +93,6 @@ router.delete("/:id", protect, async (req, res, next) => {
   const { id: ideaId } = req.params;
 
   try {
-    console.log(ideaId);
     if (!mongoose.Types.ObjectId.isValid(ideaId)) {
       res.status(404);
       throw new Error("Idea Not Found");
@@ -129,7 +127,6 @@ router.put("/:id", protect, async (req, res, next) => {
   const { id: ideaId } = req.params;
 
   try {
-    console.log(ideaId);
     if (!mongoose.Types.ObjectId.isValid(ideaId)) {
       res.status(404);
       throw new Error("Idea Not Found");

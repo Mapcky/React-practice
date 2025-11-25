@@ -8,7 +8,7 @@ export const protect = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startWith("Bearer ")) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       res.status(401);
       throw new Error("Not authorized, no token");
     }

@@ -14,7 +14,7 @@ export const fetchIdeas = async (limit?: number): Promise<Idea[]> => {
 };
 
 export const createIdea = async (newIdea: {
-  title: String;
+  title: string;
   summary: string;
   description: string;
   tags: string[];
