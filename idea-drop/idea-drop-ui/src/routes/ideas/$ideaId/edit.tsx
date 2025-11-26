@@ -4,7 +4,6 @@ import {
   useMutation,
   useSuspenseQuery,
   queryOptions,
-  QueryClient,
 } from "@tanstack/react-query";
 import { fetchIdea, updateIdea } from "@/api/ideas";
 

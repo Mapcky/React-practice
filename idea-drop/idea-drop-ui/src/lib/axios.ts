@@ -3,7 +3,7 @@ import { getStoredAccessToken, setStoredAccessToken } from "./authToken";
 import { refreshAccessToken } from "@/api/auth";
 
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: `${import.meta.env.VITE_API_URL}/api`,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -26,7 +26,6 @@ api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const originalRequest = error.config;
-
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
@@ -34,7 +33,7 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       try {
-        const { accessToken: newToken } = await refreshAccessToken();
+        const { newAccessToken: newToken } = await refreshAccessToken();
         setStoredAccessToken(newToken);
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);

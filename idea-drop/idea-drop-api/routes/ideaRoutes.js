@@ -98,7 +98,7 @@ router.delete("/:id", protect, async (req, res, next) => {
       throw new Error("Idea Not Found");
     }
 
-    const idea = await Idea.findById(id);
+    const idea = await Idea.findById(ideaId);
 
     if (!idea) {
       res.status(404);
@@ -132,7 +132,7 @@ router.put("/:id", protect, async (req, res, next) => {
       throw new Error("Idea Not Found");
     }
 
-    const idea = await Idea.findById(id);
+    const idea = await Idea.findById(ideaId);
 
     if (!idea) {
       res.status(404);
@@ -164,7 +164,7 @@ router.put("/:id", protect, async (req, res, next) => {
           .filter(Boolean)
       : [];
 
-    const updatedIdea = await idea.save;
+    const updatedIdea = await idea.save();
 
     res.json({ message: "Idea updated succesfully", idea: updatedIdea });
   } catch (err) {
